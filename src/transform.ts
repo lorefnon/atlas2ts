@@ -43,7 +43,6 @@ export interface TransformConfig {
     inputPaths: string[];
     outputPath: string;
     generator: Generator;
-    templatePath?: string;
     fieldNames: Record<string, string>,
     typeNames: Record<string, string>,
     fieldTypes: Record<string, string>,

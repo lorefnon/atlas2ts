@@ -1,5 +1,6 @@
 import { DBSchema } from "../src/DBSchema";
 import { transformAtlasConfig, TransformConfig } from "../src/transform";
+import path from "path";
 
 const baseTransformConfig: TransformConfig = {
   inputPaths: [],
@@ -103,6 +104,27 @@ test("Generates zod typespec with default config", async () => {
         id: z.number(),
         name: z.string().optional(),
     });
+    "
+  `);
+});
+
+test("Supports injection into external templates", async () => {
+  expect(
+    await transformAtlasConfig([minimalSchema], {
+      ...baseTransformConfig,
+      generator: "ts",
+      templateRoot: path.join(__dirname, "../fixtures/templates"),
+      template: "base.ts.liquid",
+    })
+  ).toMatchInlineSnapshot(`
+    "interface BaseModel {
+    }
+
+    export interface User {
+        id: number;
+        name?: string;
+    }
+
     "
   `);
 });

@@ -14,7 +14,7 @@ import { GeneratorSpec, NamingStrategySpec, TransformConfig, transformFiles } fr
 const fs = _fs.promises;
 
 const run = async () => {
-    let args: minimist.ParsedArgs;
+    let args: minimist.ParsedArgs | undefined = undefined;
     let normalizedArgs: TransformConfig;
     try {
         args = minimist(process.argv.slice(2), {
@@ -31,7 +31,7 @@ const run = async () => {
             return;
         }
     } catch (e) {
-        if (args.verbose) {
+        if (args?.verbose) {
             console.error(e);
         }
         console.error('Invalid args provided');
@@ -52,7 +52,7 @@ const NameMappingSpec = z.array(z.string())
         return transform(mapping, (result, item) => {
             const [source, target] = item.split(':');
             result[source] = target;
-        }, {});
+        }, {} as Record<string, string>);
     });
 
 const CLIArgsSpec = z.object({
@@ -78,12 +78,12 @@ const printHelp = () => {
         '-i, --input Path of one or more input files to process',
         '-o, --output Path of output file for generated types (defaults to db-types.ts)',
         '-g, --generator Generator to be used, can be ts (default) or zod',
-        '-t, --template path of liquid template file to feed generated content into',
+        '-t, --template name of liquid template file (resolved relative to template root) to feed the generated content into',
         '--template-root Root relative to which templates will be resolved',
         '--naming-strategy Strategy used to derive field & type names from column names and tables. Can be unmodified or camel-case (default)',
-        '--type-names Name & type mapping (Can be repeated) eg. -n users.name:Person.handle',
-        '--field-names Field name mapping',
-        '--field-types Field type mapping',
+        '--type-names Name & type mapping (Can be repeated)',
+        '--field-names Field name mapping (Can be repeated)',
+        '--field-types Field type mapping (Can be repeated)',
         '--verbose Enable verbose output'
     ].join('\n'));
 }
