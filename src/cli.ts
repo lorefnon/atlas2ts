@@ -42,7 +42,12 @@ const run = async () => {
     writeOutputs(output, normalizedArgs.outputPath);
 };
 
-const NameMappingSpec = z.array(z.string())
+const NameMappingSpec = z.string()
+    .or(z.string().array())
+    .transform(names => {
+        if (typeof names === 'string') return [names]
+        return names
+    })
     .refine((names: string[]) => {
         return names.find(mapping =>
             mapping.split(':').length !== 2
