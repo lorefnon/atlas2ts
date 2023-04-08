@@ -4,7 +4,7 @@ export const TypePatterns = [
     fieldType: "Date",
   },
   {
-    pattern: /(int|double|decimal|float|numeric|real)/,
+    pattern: /(int|double|decimal|float|numeric|real|serial)/,
     fieldType: "number",
   },
   {
