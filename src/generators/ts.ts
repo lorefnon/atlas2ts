@@ -5,7 +5,7 @@ import lowerFirst from "lodash/lowerFirst";
 import { DBSchema } from "../DBSchema";
 import { TransformConfig } from "../transform";
 import { removeInterpolation } from "./utils";
-import { TypePatterns } from "./shared";
+import { getBareType, TypePatterns } from "./shared";
 import { Generator } from "./Generator";
 
 export const tsGenerator: Generator = {
@@ -32,11 +32,14 @@ export const tsGenerator: Generator = {
               ? camelCase(columnName)
               : columnName.replace(/\s/g, "")
           );
-        const colType = removeInterpolation(col.type) 
+        const colType = removeInterpolation(col.type);
+        const bareColType = getBareType(colType);
+
         const fieldType =
           config.fieldTypes?.[`${typeName}.${fieldName}`] ??
           config.fieldTypes?.[fieldName] ??
           config.typeMapping?.[colType] ??
+          config.typeMapping?.[bareColType] ??
           this.getFieldType(colType, config);
         const isOptional = col.null;
         outputs.push(`    ${fieldName}${isOptional ? "?" : ""}: ${fieldType};`);

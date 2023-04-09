@@ -4,7 +4,7 @@ import lowerFirst from "lodash/lowerFirst";
 import { DBSchema } from "../DBSchema";
 import { TransformConfig } from "../transform";
 import { removeInterpolation, applyNamingStrategy } from "./utils";
-import { TypePatterns } from "./shared";
+import { getBareType, TypePatterns } from "./shared";
 import { Generator } from "./Generator";
 
 export const zodGenerator: Generator = {
@@ -24,11 +24,13 @@ export const zodGenerator: Generator = {
           config.fieldNames?.[`${tableName}.${columnName}`] ??
           config.fieldNames?.[columnName] ??
           lowerFirst(applyNamingStrategy(columnName, config.namingStrategy));
-        const colType = removeInterpolation(col.type)
+        const colType = removeInterpolation(col.type);
+        const bareColType = getBareType(colType);
         const fieldType =
           config.fieldTypes?.[`${typeName}.${fieldName}`] ??
           config.fieldTypes?.[fieldName] ??
           config.typeMapping?.[colType] ??
+          config.typeMapping?.[bareColType] ??
           this.getFieldType(colType, config);
         const isOptional = col.null;
         outputs.push(
@@ -36,7 +38,10 @@ export const zodGenerator: Generator = {
         );
       }
       outputs.push(`});`, "");
-      outputs.push(`export type I${typeName} = z.infer<typeof ${typeName}>;`, '')
+      outputs.push(
+        `export type I${typeName} = z.infer<typeof ${typeName}>;`,
+        ""
+      );
     }
   },
   getFieldType(columnType: string, config: TransformConfig) {

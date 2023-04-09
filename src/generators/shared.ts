@@ -16,3 +16,9 @@ export const TypePatterns = [
     fieldType: "boolean",
   },
 ];
+
+export const getBareType = (colType: string) => {
+  const m = colType.match(/^\s*(\S+)\s*\(.*\)$/)
+  if (!m) return colType
+  return m[1]
+}
