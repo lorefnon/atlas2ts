@@ -9,7 +9,7 @@ import { Generator } from "./Generator";
 
 export const zodGenerator: Generator = {
   generate(dbSchema: DBSchema, config: TransformConfig, outputs: string[]) {
-    outputs.push(`import * as z from "zod"`, "");
+    outputs.push(`import * as z from "zod";`, "");
     const tableNames = Object.keys(dbSchema.table);
     for (const tableName of tableNames) {
       const typeName =
@@ -34,6 +34,7 @@ export const zodGenerator: Generator = {
         );
       }
       outputs.push(`});`, "");
+      outputs.push(`export type I${typeName} = z.infer<typeof ${typeName}>;`, '')
     }
   },
   getFieldType(columnType: string, config: TransformConfig) {

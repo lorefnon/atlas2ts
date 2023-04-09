@@ -104,6 +104,8 @@ test("Generates zod typespec with default config", async () => {
         id: z.number(),
         name: z.string().optional(),
     });
+
+    export type IUser = z.infer<typeof User>
     "
   `);
 });
