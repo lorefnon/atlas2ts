@@ -13,7 +13,7 @@ export const zodGenerator: Generator = {
     const tableNames = Object.keys(dbSchema.table);
     for (const tableName of tableNames) {
       const typeName =
-        config.typeNames[tableName] ??
+        config.typeNames?.[tableName] ??
         upperFirst(applyNamingStrategy(tableName, config.namingStrategy));
       outputs.push(`export const ${typeName} = z.object({`);
       const [{ column }] = dbSchema.table[tableName];
@@ -21,13 +21,15 @@ export const zodGenerator: Generator = {
       for (const columnName of columnNames) {
         const [col] = column[columnName];
         const fieldName =
-          config.fieldNames[`${tableName}.${columnName}`] ??
-          config.fieldNames[columnName] ??
+          config.fieldNames?.[`${tableName}.${columnName}`] ??
+          config.fieldNames?.[columnName] ??
           lowerFirst(applyNamingStrategy(columnName, config.namingStrategy));
+        const colType = removeInterpolation(col.type)
         const fieldType =
-          config.fieldTypes[`${typeName}.${fieldName}`] ??
-          config.fieldTypes[fieldName] ??
-          this.getFieldType(removeInterpolation(col.type), config);
+          config.fieldTypes?.[`${typeName}.${fieldName}`] ??
+          config.fieldTypes?.[fieldName] ??
+          config.typeMapping?.[colType] ??
+          this.getFieldType(colType, config);
         const isOptional = col.null;
         outputs.push(
           `    ${fieldName}: ${fieldType}${isOptional ? ".optional()" : ""},`

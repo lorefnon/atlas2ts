@@ -3,50 +3,50 @@ import { transformAtlasConfig, TransformConfig } from "../src/transform";
 import path from "path";
 
 const baseTransformConfig: TransformConfig = {
-  inputPaths: [],
-  outputPath: "test.ts",
-  generator: "ts",
-  fieldNames: {},
-  typeNames: {},
-  fieldTypes: {},
-  namingStrategy: "camel-case",
-  verbose: false,
+    inputPaths: [],
+    outputPath: "test.ts",
+    generator: "ts",
+    fieldNames: {},
+    typeNames: {},
+    fieldTypes: {},
+    namingStrategy: "camel-case",
+    verbose: false,
 };
 
 test("Does not choke on empty input", async () => {
-  expect(
-    await transformAtlasConfig([], baseTransformConfig)
-  ).toMatchInlineSnapshot(`""`);
+    expect(
+        await transformAtlasConfig([], baseTransformConfig)
+    ).toMatchInlineSnapshot(`""`);
 
-  expect(
-    await transformAtlasConfig(
-      [
-        {
-          table: {},
-        },
-      ],
-
-      baseTransformConfig
-    )
-  ).toMatchInlineSnapshot(`""`);
-
-  expect(
-    await transformAtlasConfig(
-      [
-        {
-          table: {
-            user: [
-              {
-                column: {},
-              },
+    expect(
+        await transformAtlasConfig(
+            [
+                {
+                    table: {},
+                },
             ],
-          },
-        },
-      ],
 
-      baseTransformConfig
-    )
-  ).toMatchInlineSnapshot(`
+            baseTransformConfig
+        )
+    ).toMatchInlineSnapshot(`""`);
+
+    expect(
+        await transformAtlasConfig(
+            [
+                {
+                    table: {
+                        user: [
+                            {
+                                column: {},
+                            },
+                        ],
+                    },
+                },
+            ],
+
+            baseTransformConfig
+        )
+    ).toMatchInlineSnapshot(`
     "export interface User {
     }
     "
@@ -54,35 +54,35 @@ test("Does not choke on empty input", async () => {
 });
 
 const minimalSchema: DBSchema = {
-  table: {
-    user: [
-      {
-        column: {
-          id: [
+    table: {
+        user: [
             {
-              type: "${bigint}",
-              null: false,
+                column: {
+                    id: [
+                        {
+                            type: "${bigint}",
+                            null: false,
+                        },
+                    ],
+                    name: [
+                        {
+                            type: "${varchar(255)}",
+                            null: true,
+                        },
+                    ],
+                },
             },
-          ],
-          name: [
-            {
-              type: "${varchar(255)}",
-              null: true,
-            },
-          ],
-        },
-      },
-    ],
-  },
+        ],
+    },
 };
 
 test("Generates typescript with default config", async () => {
-  expect(
-    await transformAtlasConfig([minimalSchema], {
-      ...baseTransformConfig,
-      generator: "ts",
-    })
-  ).toMatchInlineSnapshot(`
+    expect(
+        await transformAtlasConfig([minimalSchema], {
+            ...baseTransformConfig,
+            generator: "ts",
+        })
+    ).toMatchInlineSnapshot(`
     "export interface User {
         id: number;
         name?: string;
@@ -92,33 +92,33 @@ test("Generates typescript with default config", async () => {
 });
 
 test("Generates zod typespec with default config", async () => {
-  expect(
-    await transformAtlasConfig([minimalSchema], {
-      ...baseTransformConfig,
-      generator: "zod",
-    })
-  ).toMatchInlineSnapshot(`
-    "import * as z from \\"zod\\"
+    expect(
+        await transformAtlasConfig([minimalSchema], {
+            ...baseTransformConfig,
+            generator: "zod",
+        })
+    ).toMatchInlineSnapshot(`
+    "import * as z from \\"zod\\";
 
     export const User = z.object({
         id: z.number(),
         name: z.string().optional(),
     });
 
-    export type IUser = z.infer<typeof User>
+    export type IUser = z.infer<typeof User>;
     "
   `);
 });
 
 test("Supports injection into external templates", async () => {
-  expect(
-    await transformAtlasConfig([minimalSchema], {
-      ...baseTransformConfig,
-      generator: "ts",
-      templateRoot: path.join(__dirname, "../fixtures/templates"),
-      template: "base.ts.liquid",
-    })
-  ).toMatchInlineSnapshot(`
+    expect(
+        await transformAtlasConfig([minimalSchema], {
+            ...baseTransformConfig,
+            generator: "ts",
+            templateRoot: path.join(__dirname, "../fixtures/templates"),
+            template: "base.ts.liquid",
+        })
+    ).toMatchInlineSnapshot(`
     "interface BaseModel {
     }
 
@@ -127,6 +127,38 @@ test("Supports injection into external templates", async () => {
         name?: string;
     }
 
+    "
+  `);
+});
+
+test("Supports overriding types", async () => {
+    expect(
+        await transformAtlasConfig([minimalSchema], {
+            ...baseTransformConfig,
+            generator: "ts",
+            typeMapping: { bigint: "string" },
+        })
+    ).toMatchInlineSnapshot(`
+    "export interface User {
+        id: string;
+        name?: string;
+    }
+    "
+  `);
+});
+
+test("Supports overriding types by field of specific type", async () => {
+    expect(
+        await transformAtlasConfig([minimalSchema], {
+            ...baseTransformConfig,
+            generator: "ts",
+            fieldTypes: { "User.id": "string" },
+        })
+    ).toMatchInlineSnapshot(`
+    "export interface User {
+        id: string;
+        name?: string;
+    }
     "
   `);
 });

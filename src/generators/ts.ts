@@ -13,7 +13,7 @@ export const tsGenerator: Generator = {
     const tableNames = Object.keys(dbSchema.table);
     for (const tableName of tableNames) {
       const typeName =
-        config.typeNames[tableName] ??
+        config.typeNames?.[tableName] ??
         upperFirst(
           config.namingStrategy === "camel-case"
             ? camelCase(tableName)
@@ -25,17 +25,19 @@ export const tsGenerator: Generator = {
       for (const columnName of columnNames) {
         const [col] = column[columnName];
         const fieldName =
-          config.fieldNames[`${tableName}.${columnName}`] ??
-          config.fieldNames[columnName] ??
+          config.fieldNames?.[`${tableName}.${columnName}`] ??
+          config.fieldNames?.[columnName] ??
           lowerFirst(
             config.namingStrategy === "camel-case"
               ? camelCase(columnName)
               : columnName.replace(/\s/g, "")
           );
+        const colType = removeInterpolation(col.type) 
         const fieldType =
-          config.fieldTypes[`${typeName}.${fieldName}`] ??
-          config.fieldTypes[fieldName] ??
-          this.getFieldType(removeInterpolation(col.type), config);
+          config.fieldTypes?.[`${typeName}.${fieldName}`] ??
+          config.fieldTypes?.[fieldName] ??
+          config.typeMapping?.[colType] ??
+          this.getFieldType(colType, config);
         const isOptional = col.null;
         outputs.push(`    ${fieldName}${isOptional ? "?" : ""}: ${fieldType};`);
       }

@@ -9,9 +9,9 @@ export const removeInterpolation = (str: string) => {
 
 export const applyNamingStrategy = (
   name: string,
-  namingStrategy: NamingStrategy
+  namingStrategy: NamingStrategy | undefined
 ) => {
-  return namingStrategy === "camel-case"
-    ? camelCase(name)
-    : name.replace(/\s/g, "");
+  return namingStrategy === "unmodified"
+    ? name.replace(/\s/g, "")
+    : camelCase(name);
 };

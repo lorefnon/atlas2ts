@@ -67,6 +67,7 @@ const CLIArgsSpec = z.object({
     output: z.string().optional(),
     generator: GeneratorSpec.optional(),
     'field-names': NameMappingSpec.optional(),
+    'type-mapping': NameMappingSpec.optional(),
     'type-names': NameMappingSpec.optional(),
     'field-types': NameMappingSpec.optional(),
     'naming-strategy': NamingStrategySpec.optional(),
@@ -86,9 +87,10 @@ const printHelp = () => {
         '-t, --template name of liquid template file (resolved relative to template root) to feed the generated content into',
         '--template-root Root relative to which templates will be resolved',
         '--naming-strategy Strategy used to derive field & type names from column names and tables. Can be unmodified or camel-case (default)',
+        '--type-mapping Mapping of database types to ts types (Can be repeated)',
         '--type-names Name & type mapping (Can be repeated)',
-        '--field-names Field name mapping (Can be repeated)',
-        '--field-types Field type mapping (Can be repeated)',
+        '--field-names Override names for specific fields (Can be repeated)',
+        '--field-types Override types for specific fields (Can be repeated)',
         '--verbose Enable verbose output'
     ].join('\n'));
 }
@@ -109,6 +111,7 @@ const parseArgs = (args: minimist.ParsedArgs): TransformConfig => {
         fieldNames: parsed['field-names'] ?? {},
         typeNames: parsed['type-names'] ?? {},
         fieldTypes: parsed['field-types'] ?? {},
+        typeMapping: parsed['type-mapping'] ?? {},
         namingStrategy: parsed['naming-strategy'] ?? 'camel-case',
         template: parsed.template,
         templateRoot: parsed['template-root']
