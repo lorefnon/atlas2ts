@@ -1,13 +1,14 @@
 {
   "name": "atlas2ts",
-  "version": "0.0.5",
-  "description": "Autogenerate Zod typespecs from Atlas DDL spec",
+  "version": "0.0.6",
+  "description": "Autogenerate typescript interfaces & Zod typespecs from Atlas DDL spec",
   "main": "index.js",
-  "author": "Lorefnon <lorefnon@gmail.com>",
+  "author": "Lorefnon <lorefnon@tutanota.com>",
   "license": "MIT",
   "private": false,
   "bin": "./dist/cli.js",
   "scripts": {
+    "prepublishOnly": "pnpm run build && pnpm run test",
     "build": "tsup ./src/*.ts",
     "test": "jest",
     "format": "prettier --write ./src/**/*.ts ./test/**/*.ts"

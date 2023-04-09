@@ -69,13 +69,32 @@ Atlas2TS usually makes a sane guess around what db types should be mapped to wha
 
 However, it may need help when custom types or json fields are used.
 
-For these scenarios, you can specify the types to be used in generated through field-types argument.
+For these scenarios, you can specify the types to be used in generated through type-mapping or field-types argument.
+
+`--type-mapping` allows you to specify what type should be used for a specific db level type.
+
+
+```
+atlas2ts -i fixtures/dvdrental.hcl -o fixtures/dvdrental.ts --type-mapping decimal:string
+```
+
+`--field-types` allows you to specify what type should be used for a specific field:
+
+```
+atlas2ts -i fixtures/dvdrental.hcl -o fixtures/dvdrental.ts --field-types User.email:string
+```
+
+Note that the key here is typename.fieldname combination which can be different from tablename.columnname:
 
 ```
 atlas2ts -i fixtures/dvdrental.hcl -o fixtures/dvdrental.ts --field-names user.name:handle --field-types User.handle:string
 ```
 
-Note that the key here (`User.handle` is typename.fieldname combination which is different from tablename.columnname)
+The typename in the key is optional, so we can use just the fieldname to override the type of a field in all tables:
+
+```
+atlas2ts -i fixtures/dvdrental.hcl -o fixtures/dvdrental.ts --field-types createdAt:Date
+```
 
 If these types need to be imported from elsewhere you can also define a [liquid](https://liquidjs.com/) template containing relevant imports into which the output will be injected.
 
