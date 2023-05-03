@@ -1,3 +1,5 @@
+import { Column } from "../DBSchema";
+
 export const TypePatterns = [
   {
     pattern: /(date|timestamp)/,
@@ -18,7 +20,34 @@ export const TypePatterns = [
 ];
 
 export const getBareType = (colType: string) => {
-  const m = colType.match(/^\s*(\S+)\s*\(.*\)$/)
-  if (!m) return colType
-  return m[1]
+  const m = colType.match(/^\s*(\S+)\s*\(.*\)$/);
+  if (!m) return colType;
+  return m[1];
+};
+
+export interface GeneratedEntityType {
+  type: string;
+  prefix?: string;
+  suffix?: string;
 }
+
+export const EntityTypes = [
+  {
+    type: "base",
+  },
+  {
+    type: "new",
+    prefix: "New",
+  },
+  {
+    type: "patch",
+    suffix: "Patch",
+  },
+];
+
+export const isFieldOptional = (col: Column, type: string) => {
+  if (type === "base") return col.null;
+  if (type === "patch") return true;
+  if (type === "new") return col.null || !!col.default;
+  return false;
+};

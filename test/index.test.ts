@@ -49,6 +49,12 @@ test("Does not choke on empty input", async () => {
   ).toMatchInlineSnapshot(`
     "export interface User {
     }
+
+    export interface NewUser {
+    }
+
+    export interface UserPatch {
+    }
     "
   `);
 });
@@ -76,6 +82,35 @@ const minimalSchema: DBSchema = {
   },
 };
 
+const schemaWithDefaultsAndOptionals: DBSchema = {
+  table: {
+    user: [
+      {
+        column: {
+          id: [
+            {
+              type: "${bigint}",
+              null: false,
+            },
+          ],
+          name: [
+            {
+              type: "${varchar(255)}",
+              null: true,
+            },
+          ],
+          created_at: [
+            {
+              type: "${timestamp}",
+              default: "now()"
+            }
+          ]
+        },
+      },
+    ],
+  },
+}
+
 test("Generates typescript with default config", async () => {
   expect(
     await transformAtlasConfig([minimalSchema], {
@@ -85,6 +120,16 @@ test("Generates typescript with default config", async () => {
   ).toMatchInlineSnapshot(`
     "export interface User {
         id: number;
+        name?: string;
+    }
+
+    export interface NewUser {
+        id: number;
+        name?: string;
+    }
+
+    export interface UserPatch {
+        id?: number;
         name?: string;
     }
     "
@@ -106,6 +151,20 @@ test("Generates zod typespec with default config", async () => {
     });
 
     export type IUser = z.infer<typeof User>;
+
+    export const NewUser = z.object({
+        id: z.number(),
+        name: z.string().optional(),
+    });
+
+    export type INewUser = z.infer<typeof User>;
+
+    export const UserPatch = z.object({
+        id: z.number().optional(),
+        name: z.string().optional(),
+    });
+
+    export type IUserPatch = z.infer<typeof User>;
     "
   `);
 });
@@ -127,6 +186,16 @@ test("Supports injection into external templates", async () => {
         name?: string;
     }
 
+    export interface NewUser {
+        id: number;
+        name?: string;
+    }
+
+    export interface UserPatch {
+        id?: number;
+        name?: string;
+    }
+
     "
   `);
 });
@@ -143,6 +212,16 @@ test("Supports overriding types", async () => {
         id: string;
         name?: string;
     }
+
+    export interface NewUser {
+        id: string;
+        name?: string;
+    }
+
+    export interface UserPatch {
+        id?: string;
+        name?: string;
+    }
     "
   `);
 });
@@ -157,6 +236,16 @@ test("Supports overriding types by field of specific type", async () => {
   ).toMatchInlineSnapshot(`
     "export interface User {
         id: string;
+        name?: string;
+    }
+
+    export interface NewUser {
+        id: string;
+        name?: string;
+    }
+
+    export interface UserPatch {
+        id?: string;
         name?: string;
     }
     "
