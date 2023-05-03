@@ -1,6 +1,6 @@
 {
     "name": "atlas2ts",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Autogenerate typescript interfaces & Zod typespecs from Atlas DDL spec",
     "main": "index.js",
     "author": "Lorefnon <lorefnon@tutanota.com>",
