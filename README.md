@@ -1,3 +1,7 @@
+⚠️ This project is no longer under active development as I have found atlas to not be suitable for my use cases.
+
+----
+
 # Atlas2TS
 
 Generates typescript interfaces or [zod](https://github.com/colinhacks/zod) typespecs from [atlas](https://atlasgo.io/) DDL specification.
